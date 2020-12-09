@@ -37,8 +37,7 @@ public class MainActivity extends AppCompatActivity {
         selectBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(Intent.createChooser(new Intent().setAction(Intent.ACTION_GET_CONTENT)
-                .setType("video/mp4"),"Select a video"),1);
+                startActivityForResult(new Intent(Intent.ACTION_PICK,   MediaStore.Video.Media.EXTERNAL_CONTENT_URI).setType("video/*"),1);
             }
         });
 

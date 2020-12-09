@@ -3,6 +3,7 @@ package com.example.trell_assignment;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.MediaController;
@@ -31,6 +33,8 @@ public class VideoCompressionActivity extends AppCompatActivity {
     private VideoView videoViewl;
     private Button comressionBtn;
     private FFmpeg ffmpeg;
+    private String outputFileAbsolutePath;
+    private String inputFileAbsolutePath;
     private EditText bitrate;
     private MediaController mediaController;
     @Override
@@ -58,18 +62,29 @@ public class VideoCompressionActivity extends AppCompatActivity {
         }
 
         //File inputFile= new File(videoUri.getPath());
-        String inputFileAbsolutePath = getRealPathFromURI(getApplicationContext(),videoUri);
+        inputFileAbsolutePath = getRealPathFromURI(getApplicationContext(),videoUri);
         File folder = new File(Environment.getExternalStorageDirectory() + "/compressed");
         if(!folder.exists()){
             folder.mkdir();
         }
         File outputFile = new File(folder,"output.mp4");
-        String outputFileAbsolutePath=outputFile.getAbsolutePath();
+        outputFileAbsolutePath=outputFile.getAbsolutePath();
         System.out.println("input"+inputFileAbsolutePath);
         System.out.println("output"+outputFileAbsolutePath);
-        String[] command = {"-y", "-i", "/storage/emulated/0/Movies/Instagram/VID_62741227_222840_778.mp4", "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", "150k", "-b:a", "48000", "-ac", "2", "-ar", "22050", outputFileAbsolutePath};
 
-        execFFmpegBinary(command);
+        comressionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!bitrate.getText().toString().isEmpty()){
+                    String[] command = {"-y", "-i", inputFileAbsolutePath, "-s", "160x120", "-r", "25", "-vcodec", "mpeg4", "-b:v", bitrate.getText().toString()+"k", "-b:a", "48000", "-ac", "2", "-ar", "22050", outputFileAbsolutePath};
+
+                    execFFmpegBinary(command);
+                }
+                else{
+                    Toast.makeText(VideoCompressionActivity.this, "Please enter the bitrate", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 
@@ -154,11 +169,19 @@ public class VideoCompressionActivity extends AppCompatActivity {
                 @Override
                 public void onStart() {
                     System.out.println("start");
+                    comressionBtn.setVisibility(View.GONE);
+                    findViewById(R.id.progress).setVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onFinish() {
                     System.out.println("Finish");
+                    comressionBtn.setVisibility(View.VISIBLE);
+                    findViewById(R.id.progress).setVisibility(View.INVISIBLE);
+                    Uri outputUri=Uri.fromFile(new File(outputFileAbsolutePath));
+                    Intent i1 = new Intent(VideoCompressionActivity.this, OutputActivity.class);
+                    i1.putExtra("VideoUri", outputUri.toString());
+                    startActivity(i1);
                 }
             });
         }
