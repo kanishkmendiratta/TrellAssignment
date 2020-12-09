@@ -154,6 +154,7 @@ public class VideoCompressionActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(String message) {
                     System.out.println("Fail inside "+message);
+                    Toast.makeText(VideoCompressionActivity.this, "Please check your Permissions", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
