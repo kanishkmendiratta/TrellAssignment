@@ -63,7 +63,7 @@ public class VideoCompressionActivity extends AppCompatActivity {
 
         //File inputFile= new File(videoUri.getPath());
         inputFileAbsolutePath = getRealPathFromURI(getApplicationContext(),videoUri);
-        File folder = new File(Environment.getExternalStorageDirectory() + "/compressed");
+        File folder = new File(Environment.getExternalStorageDirectory() + "/CompressedVideos");
         if(!folder.exists()){
             folder.mkdir();
         }
